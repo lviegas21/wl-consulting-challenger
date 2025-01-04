@@ -24,6 +24,11 @@ class TaskRepositoryImpl implements TaskRepository {
   }
 
   @override
+  Future<List<TaskEntity>> getTasksPaginated(int offset, int limit) async {
+    return await taskDatabase.getTasksPaginated(offset, limit);
+  }
+
+  @override
   Future<void> updateTask(TaskEntity task) async {
     await taskDatabase.updateTask(task);
   }

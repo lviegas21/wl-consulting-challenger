@@ -39,3 +39,10 @@ class SearchTaskEvent extends TaskEvent {
   @override
   List<Object?> get props => [query];
 }
+
+class LoadMoreTasksEvent extends TaskEvent {
+  final int offset;
+  final int limit;
+
+  LoadMoreTasksEvent({required this.offset, required this.limit});
+}

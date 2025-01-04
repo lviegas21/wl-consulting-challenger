@@ -22,4 +22,8 @@ class TaskUsecase {
   Future<void> update(TaskEntity task) async {
     return await taskRepository.updateTask(task);
   }
+
+  Future<List<TaskEntity>> getPaginated(int offset, int limit) async {
+    return await taskRepository.getTasksPaginated(offset, limit);
+  }
 }

@@ -24,8 +24,8 @@ AppBar buildAppBar() {
       Padding(
         padding: EdgeInsets.all(8.0),
         child: CircleAvatar(
-          backgroundImage: NetworkImage(
-              "https://randomuser.me/api/portraits/men/11.jpg"), // Imagem do perfil
+          backgroundColor: Colors.blue,
+          child: Icon(Icons.person, color: Colors.white),
         ),
       ),
     ],

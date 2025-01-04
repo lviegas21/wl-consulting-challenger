@@ -1,13 +1,16 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:wl_consulting_challenger/domain/entities/entities.dart';
 import 'package:wl_consulting_challenger/domain/usecases/usecases.dart';
 import '../ui/ui.dart';
 
 class TaskBloc extends Bloc<TaskEvent, TaskState> {
   final TaskUsecase usecase;
+  static const int pageSize = 10;
 
   TaskBloc({required this.usecase}) : super(TaskInitialState()) {
     on<CompletedTaskEvent>(_onLoadCompletedTasks);
     on<LoadTasksEvent>(_onLoadTasks);
+    on<LoadMoreTasksEvent>(_onLoadMoreTasks);
     on<AddTaskEvent>(_onAddTask);
     on<UpdateTaskEvent>(_onUpdateTask);
     on<DeleteTaskEvent>(_onDeleteTask);
@@ -129,6 +132,23 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
       }
     } catch (e) {
       emit(TaskErrorState(e.toString()));
+    }
+  }
+
+  Future<void> _onLoadMoreTasks(
+      LoadMoreTasksEvent event, Emitter<TaskState> emit) async {
+    final currentState = state;
+    if (currentState is TaskLoadedState) {
+      final currentTasks = List<TaskEntity>.from(currentState.tasks);
+      emit(TaskLoadingMoreState(currentTasks));
+      
+      try {
+        final moreTasks = await usecase.getPaginated(event.offset, event.limit);
+        final allTasks = [...currentTasks, ...moreTasks];
+        emit(TaskLoadedState(allTasks, hasMoreItems: moreTasks.length >= event.limit));
+      } catch (e) {
+        emit(TaskErrorState(e.toString()));
+      }
     }
   }
 }

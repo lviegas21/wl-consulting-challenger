@@ -73,6 +73,24 @@ class TaskDatabaseImpl implements TaskDatabase {
   }
 
   @override
+  Future<List<TaskEntity>> getTasksPaginated(int offset, int limit) async {
+    final db = await database;
+
+    final maps = await db.query(
+      'tasks',
+      orderBy: 'id ASC',
+      limit: limit,
+      offset: offset,
+    );
+
+    if (maps.isNotEmpty) {
+      return maps.map((task) => TaskModel.fromJson(task).toEntity()).toList();
+    } else {
+      return [];
+    }
+  }
+
+  @override
   Future<void> updateTask(TaskEntity task) async {
     final db = await database;
 

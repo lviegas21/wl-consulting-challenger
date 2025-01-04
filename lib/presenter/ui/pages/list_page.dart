@@ -7,8 +7,48 @@ import '../task_event.dart';
 import '../task_state.dart';
 import '../widget/task_card_widget.dart';
 
-class ListPage extends StatelessWidget {
+class ListPage extends StatefulWidget {
   const ListPage({super.key});
+
+  @override
+  State<ListPage> createState() => _ListPageState();
+}
+
+class _ListPageState extends State<ListPage> {
+  final ScrollController _scrollController = ScrollController();
+  bool _isLoadingMore = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_isLoadingMore) return;
+    
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.position.pixels;
+    if (currentScroll >= maxScroll * 0.9) {
+      _isLoadingMore = true;
+      final currentState = context.read<TaskBloc>().state;
+      if (currentState is TaskLoadedState && currentState.hasMoreItems) {
+        context.read<TaskBloc>().add(
+              LoadMoreTasksEvent(
+                offset: currentState.tasks.length,
+                limit: TaskBloc.pageSize,
+              ),
+            );
+      }
+      _isLoadingMore = false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,8 +63,10 @@ class ListPage extends StatelessWidget {
             return _buildTaskList(context, state.tasks);
           } else if (state is TaskLoadedState) {
             return _buildTaskList(context, state.tasks);
+          } else if (state is TaskLoadingMoreState) {
+            return _buildTaskList(context, state.currentTasks, isLoadingMore: true);
           } else if (state is TaskErrorState) {
-            return Center(child: Text('Error: ${state.error}'));
+            return Center(child: Text('Erro: ${state.error}'));
           }
           return const Center(child: CircularProgressIndicator());
         },
@@ -32,7 +74,7 @@ class ListPage extends StatelessWidget {
     );
   }
 
-  Widget _buildTaskList(BuildContext context, List<TaskEntity> tasks) {
+  Widget _buildTaskList(BuildContext context, List<TaskEntity> tasks, {bool isLoadingMore = false}) {
     if (tasks.isEmpty) {
       return Center(
         child: Column(
@@ -45,7 +87,7 @@ class ListPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              'You have no task listed.',
+              'Você não tem tarefas listadas.',
               style: TextStyle(
                 color: Colors.grey[600],
                 fontSize: 16,
@@ -54,7 +96,7 @@ class ListPage extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Create tasks to achieve more.',
+              'Crie tarefas para alcançar mais.',
               style: TextStyle(
                 color: Colors.grey[400],
                 fontSize: 14,
@@ -71,7 +113,7 @@ class ListPage extends StatelessWidget {
         const Padding(
           padding: EdgeInsets.only(top: 16.0),
           child: Text(
-            'Welcome, John.',
+            'Bem-vindo, John.',
             style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 20,
@@ -82,7 +124,7 @@ class ListPage extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: Text(
-            "You've got ${tasks.length} tasks to do.",
+            "Você tem ${tasks.length} tarefas para fazer.",
             style: const TextStyle(
               color: Colors.grey,
               fontSize: 16,
@@ -91,8 +133,15 @@ class ListPage extends StatelessWidget {
         ),
         Expanded(
           child: ListView.builder(
-            itemCount: tasks.length,
+            controller: _scrollController,
+            itemCount: tasks.length + (isLoadingMore ? 1 : 0),
             itemBuilder: (context, index) {
+              if (index == tasks.length) {
+                return const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              }
               final task = tasks[index];
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),

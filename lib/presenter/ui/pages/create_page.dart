@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/entities/entities.dart';
 import '../../bloc/task_bloc.dart';
-import '../task_event.dart';
 import '../task_state.dart';
+import '../widgets/empty_state.dart';
+import '../widgets/task_create_modal.dart';
 
 class CreatePage extends StatelessWidget {
   const CreatePage({super.key});
@@ -22,49 +23,24 @@ class CreatePage extends StatelessWidget {
                   : [];
 
           if (tasks.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.task_alt_outlined,
-                    size: 64,
-                    color: Colors.grey[300],
+            return EmptyState(
+              icon: Icons.task_alt_outlined,
+              message: 'Você não tem tarefas listadas.',
+              submessage: 'Crie tarefas para alcançar mais.',
+              action: ElevatedButton.icon(
+                onPressed: () => _showCreateTaskModal(context),
+                icon: const Icon(Icons.add),
+                label: const Text('Criar tarefa'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue[300],
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
                   ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'You have no task listed.',
-                    style: TextStyle(
-                      color: Colors.grey[600],
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Create tasks to achieve more.',
-                    style: TextStyle(
-                      color: Colors.grey[400],
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  ElevatedButton.icon(
-                    onPressed: () => _showCreateTaskModal(context),
-                    icon: const Icon(Icons.add),
-                    label: const Text('Create task'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue[300],
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             );
           }
@@ -75,7 +51,7 @@ class CreatePage extends StatelessWidget {
               const Padding(
                 padding: EdgeInsets.only(top: 16.0),
                 child: Text(
-                  'Welcome, John.',
+                  'Bem-vindo, John.',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
@@ -86,7 +62,7 @@ class CreatePage extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: Text(
-                  "You've got ${tasks.length} tasks to do.",
+                  "Você tem ${tasks.length} tarefas para fazer.",
                   style: const TextStyle(
                     color: Colors.grey,
                     fontSize: 16,
@@ -98,7 +74,7 @@ class CreatePage extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: () => _showCreateTaskModal(context),
                     icon: const Icon(Icons.add),
-                    label: const Text('Create task'),
+                    label: const Text('Criar tarefa'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue[300],
                       padding: const EdgeInsets.symmetric(
@@ -120,107 +96,13 @@ class CreatePage extends StatelessWidget {
   }
 
   void _showCreateTaskModal(BuildContext context) {
-    final titleController = TextEditingController();
-    final descriptionController = TextEditingController();
-
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder: (context) {
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-            top: 16,
-            left: 16,
-            right: 16,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextField(
-                controller: titleController,
-                decoration: InputDecoration(
-                  hintText: "What's in your mind?",
-                  border: InputBorder.none,
-                  hintStyle: TextStyle(
-                    color: Colors.grey[400],
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-              Divider(height: 1, color: Colors.grey[300]),
-              Row(
-                children: [
-                  Icon(Icons.edit_outlined, color: Colors.grey[400], size: 20),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: TextField(
-                      controller: descriptionController,
-                      decoration: InputDecoration(
-                        hintText: "Add a note...",
-                        border: InputBorder.none,
-                        hintStyle: TextStyle(
-                          color: Colors.grey[400],
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () {
-                    final title = titleController.text.trim();
-                    final description = descriptionController.text.trim();
-
-                    if (title.isNotEmpty) {
-                      context.read<TaskBloc>().add(
-                            AddTaskEvent(
-                              TaskEntity(
-                                id: null,
-                                title: title,
-                                description: description,
-                                isCompleted: false,
-                              ),
-                            ),
-                          );
-                      Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Task created successfully!'),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Please add a task title'),
-                          backgroundColor: Colors.red,
-                        ),
-                      );
-                    }
-                  },
-                  child: Text(
-                    "Create",
-                    style: TextStyle(
-                      color: Colors.blue[300],
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
+      builder: (context) => const TaskCreateModal(),
     );
   }
 }

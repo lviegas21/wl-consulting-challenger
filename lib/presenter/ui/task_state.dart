@@ -18,11 +18,12 @@ class TaskLoadingState extends TaskState {
 
 class TaskLoadedState extends TaskState {
   final List<TaskEntity> tasks;
+  final bool hasMoreItems;
 
-  const TaskLoadedState(this.tasks);
+  TaskLoadedState(this.tasks, {this.hasMoreItems = true});
 
   @override
-  List<Object?> get props => [tasks];
+  List<Object?> get props => [tasks, hasMoreItems];
 }
 
 class TaskCompletedState extends TaskState {
@@ -71,4 +72,13 @@ class TaskSearchState extends TaskState {
 
   @override
   List<Object?> get props => [searchResults, query];
+}
+
+class TaskLoadingMoreState extends TaskState {
+  final List<TaskEntity> currentTasks;
+
+  TaskLoadingMoreState(this.currentTasks);
+
+  @override
+  List<Object?> get props => [currentTasks];
 }
