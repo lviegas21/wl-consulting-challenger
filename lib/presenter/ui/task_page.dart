@@ -8,7 +8,7 @@ import 'package:wl_consulting_challenger/presenter/ui/pages/sucess_page.dart';
 import '../bloc/bloc.dart';
 import 'task_event.dart';
 import 'task_state.dart';
-import 'widget/app_bar_widget.dart';
+import 'widgets/app_bar_widget.dart';
 
 class TaskPage extends StatelessWidget {
   const TaskPage({Key? key}) : super(key: key);

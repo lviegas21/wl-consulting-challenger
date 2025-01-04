@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../../domain/entities/entities.dart';
 import '../../bloc/bloc.dart';
 import '../task_event.dart';
 import '../task_state.dart';
@@ -25,7 +23,9 @@ class SucessPage extends StatelessWidget {
           final tasks = state is TaskNavigationState
               ? state.tasks.where((task) => task.isCompleted == true).toList()
               : state is TaskLoadedState
-                  ? state.tasks.where((task) => task.isCompleted == true).toList()
+                  ? state.tasks
+                      .where((task) => task.isCompleted == true)
+                      .toList()
                   : [];
 
           if (tasks.isEmpty) {

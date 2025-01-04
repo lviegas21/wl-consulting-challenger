@@ -5,7 +5,7 @@ import '../../../domain/entities/entities.dart';
 import '../../bloc/task_bloc.dart';
 import '../task_event.dart';
 import '../task_state.dart';
-import '../widget/task_card_widget.dart';
+import '../widgets/task_card_widget.dart';
 
 class ListPage extends StatefulWidget {
   const ListPage({super.key});
@@ -32,7 +32,7 @@ class _ListPageState extends State<ListPage> {
 
   void _onScroll() {
     if (_isLoadingMore) return;
-    
+
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.position.pixels;
     if (currentScroll >= maxScroll * 0.9) {
@@ -64,7 +64,8 @@ class _ListPageState extends State<ListPage> {
           } else if (state is TaskLoadedState) {
             return _buildTaskList(context, state.tasks);
           } else if (state is TaskLoadingMoreState) {
-            return _buildTaskList(context, state.currentTasks, isLoadingMore: true);
+            return _buildTaskList(context, state.currentTasks,
+                isLoadingMore: true);
           } else if (state is TaskErrorState) {
             return Center(child: Text('Erro: ${state.error}'));
           }
@@ -74,7 +75,8 @@ class _ListPageState extends State<ListPage> {
     );
   }
 
-  Widget _buildTaskList(BuildContext context, List<TaskEntity> tasks, {bool isLoadingMore = false}) {
+  Widget _buildTaskList(BuildContext context, List<TaskEntity> tasks,
+      {bool isLoadingMore = false}) {
     if (tasks.isEmpty) {
       return Center(
         child: Column(
