@@ -17,6 +17,7 @@ class TaskCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: const EdgeInsets.only(bottom: 8),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -29,35 +30,41 @@ class TaskCard extends StatelessWidget {
           ),
         ],
       ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(16),
-        leading: Checkbox(
-          value: task.isCompleted,
-          onChanged: (value) => onToggleCompleted(value!),
-        ),
-        title: Text(
-          task.title ?? '',
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 18,
+      child: Theme(
+        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        child: ExpansionTile(
+          tilePadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+          leading: Checkbox(
+            value: task.isCompleted,
+            onChanged: (value) => onToggleCompleted(value!),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(4),
+            ),
           ),
-        ),
-        subtitle: Text(
-          task.description ?? '',
-          style: TextStyle(
-            color: Colors.grey.shade600,
-            fontSize: 14,
+          title: Text(
+            task.title ?? '',
+            style: const TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 16,
+            ),
           ),
+          trailing: const Icon(Icons.more_horiz, color: Colors.grey),
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(72, 0, 16, 16),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  task.description ?? 'No description',
+                  style: TextStyle(
+                    color: Colors.grey.shade600,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
-        trailing: IconButton(
-          icon: const Icon(Icons.more_vert, color: Colors.grey),
-          onPressed: () {
-            // Ações adicionais, como editar ou compartilhar
-          },
-        ),
-        onTap: () {
-          // Ação ao tocar no card
-        },
       ),
     );
   }
